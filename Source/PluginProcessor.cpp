@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 DistortionPluginAudioProcessor::DistortionPluginAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -19,13 +20,32 @@ DistortionPluginAudioProcessor::DistortionPluginAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), parameters(*this, nullptr, "PARAMETERS", createParameters())
 #endif
 {
 }
 
 DistortionPluginAudioProcessor::~DistortionPluginAudioProcessor()
 {
+}
+
+
+juce::AudioProcessorValueTreeState::ParameterLayout DistortionPluginAudioProcessor::createParameters()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout parameters;
+
+ //=========================== DRIVE ===============================
+
+    parameters.add(std::make_unique<juce::AudioParameterFloat>(
+        "DRIVE",
+        "Drive",
+        0.0f,
+        10.0f,
+        0.0f
+        ));
+
+    return parameters;
+     
 }
 
 //==============================================================================
@@ -135,27 +155,14 @@ void DistortionPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+  
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+  
+    auto driveValue = parameters.getRawParameterValue("DRIVE")->load();
 
-        // ..do something to the data...
-    }
+    distortion.process(buffer, driveValue);
 }
 
 //==============================================================================

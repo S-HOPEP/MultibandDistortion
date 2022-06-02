@@ -11,7 +11,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void process(juce::AudioBuffer<float>, float inGain, int inType);
+    void process(juce::AudioBuffer<float>, float inGain);
 
 private:
     

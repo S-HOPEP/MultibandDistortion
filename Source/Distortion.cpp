@@ -8,21 +8,20 @@ Distortion::Distortion(){}
 
 Distortion::~Distortion(){}
 
-void process(juce::AudioBuffer<float>inBuffer, float inGain, int inType) 
+void process(juce::AudioBuffer<float>inBuffer, float inGain) 
 {
 	for(int channel = 0; channel < inBuffer.getNumChannels(); channel++) 
 	{
 		for(int i = 0; i < inBuffer.getNumSamples(); channel++)
 		{
-			float sample = inBuffer.getSample(channel, 1);
+			float sample = inBuffer.getSample(channel, i);
 
 			float newInput = sample * (inGain / 10.0f);
 
 			float out = 0.0f;
 
-			switch (inType)
 			{
-				case 0:
+				
 					if (newInput >= 1.0f)
 
 						out = 1.0f;
@@ -35,8 +34,6 @@ void process(juce::AudioBuffer<float>inBuffer, float inGain, int inType)
 
 						out = -1.0f;
 						out = out * 0.5f;
-
-				break;
 			}
 
 			inBuffer.setSample(channel, i, out);
