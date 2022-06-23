@@ -4,11 +4,9 @@
 #include "Distortion.h"
 
 
-Distortion::Distortion(){}
 
-Distortion::~Distortion(){}
 
-void process(juce::AudioBuffer<float>inBuffer, float inGain) 
+void Distortion::process(juce::AudioBuffer<float>inBuffer, float inGain) 
 {
 	for(int channel = 0; channel < inBuffer.getNumChannels(); channel++) 
 	{
